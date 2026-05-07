@@ -79,6 +79,19 @@
   .hero {
     padding: 100px 56px 90px;
     max-width: 860px;
+    position: relative;
+  }
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero > *:not(#hero-canvas) {
+    position: relative;
+    z-index: 1;
   }
   .hero-eyebrow {
     display: inline-flex;
@@ -433,6 +446,7 @@
 
 <!-- HERO -->
 <div class="hero">
+  <canvas id="hero-canvas"></canvas>
   <h1>DLCG <span class="grad">Innovation Labs</span></h1>
   <p class="hero-blurb">
     A small, fast-moving team inside DLCG with one job: build things that matter. We experiment, iterate, and ship — constantly finding better ways to solve the real problems our business faces every day.
@@ -531,5 +545,119 @@
   <div class="footer-copy">© 2026 DLCG · Innovation Labs</div>
 </footer>
 
+<script>
+(function () {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Brand colours (low opacity so white bg stays clean)
+  const COLORS = [
+    'rgba(99,102,241,',   // indigo
+    'rgba(245,158,11,',   // gold
+    'rgba(139,92,246,',   // violet bridge
+  ];
+
+  let W, H, particles, time = 0;
+
+  /* ── Particle ── */
+  function Particle() { this.reset(true); }
+  Particle.prototype.reset = function (init) {
+    this.x  = Math.random() * W;
+    this.y  = init ? Math.random() * H : (Math.random() < 0.5 ? -10 : H + 10);
+    this.r  = 1.5 + Math.random() * 2.5;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.life = 0;
+    this.maxLife = 300 + Math.random() * 400;
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    // swirl params
+    this.angle  = Math.random() * Math.PI * 2;
+    this.radius = 40 + Math.random() * 120;
+    this.speed  = 0.003 + Math.random() * 0.006;
+    this.cx = this.x;
+    this.cy = this.y;
+  };
+  Particle.prototype.update = function () {
+    this.life++;
+    this.angle += this.speed;
+    // drift the centre slowly
+    this.cx += this.vx;
+    this.cy += this.vy;
+    // orbit around drifting centre
+    this.x = this.cx + Math.cos(this.angle) * this.radius;
+    this.y = this.cy + Math.sin(this.angle) * this.radius;
+    if (this.life > this.maxLife) this.reset(false);
+  };
+  Particle.prototype.alpha = function () {
+    const t = this.life / this.maxLife;
+    // fade in/out
+    return t < 0.15 ? t / 0.15 : t > 0.8 ? (1 - t) / 0.2 : 1;
+  };
+
+  /* ── Setup ── */
+  function resize() {
+    const hero = canvas.parentElement;
+    W = canvas.width  = hero.offsetWidth;
+    H = canvas.height = hero.offsetHeight;
+  }
+
+  function init() {
+    resize();
+    const count = Math.min(60, Math.floor((W * H) / 14000));
+    particles = Array.from({ length: count }, () => new Particle());
+  }
+
+  /* ── Draw ── */
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    time++;
+
+    // draw connecting lines between nearby particles
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 130) {
+          const a = (1 - dist / 130) * 0.12
+                    * particles[i].alpha()
+                    * particles[j].alpha();
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = particles[i].color + a + ')';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // draw particles
+    particles.forEach(p => {
+      p.update();
+      const a = p.alpha() * 0.55;
+      // soft glow
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
+      g.addColorStop(0, p.color + a + ')');
+      g.addColorStop(1, p.color + '0)');
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+      // solid core
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + (a * 1.4) + ')';
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+  init();
+  draw();
+})();
+</script>
 </body>
 </html>
