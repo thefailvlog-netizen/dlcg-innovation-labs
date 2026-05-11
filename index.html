@@ -254,6 +254,8 @@
     border-radius: 16px;
     overflow: hidden;
     transition: box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
   }
   .product-card:not(.soon):hover {
     box-shadow: 0 8px 32px rgba(99,102,241,0.1);
@@ -287,7 +289,7 @@
     border: 1px solid rgba(245,158,11,0.3);
     color: #d97706;
   }
-  .product-body { padding: 24px; }
+  .product-body { padding: 24px; display: flex; flex-direction: column; flex: 1; }
   .product-author {
     display: flex;
     align-items: center;
@@ -340,6 +342,7 @@
     gap: 8px;
     padding-top: 18px;
     border-top: 1px solid var(--border);
+    margin-top: auto;
   }
   .btn-try {
     flex: 1;
@@ -400,6 +403,100 @@
   }
   .soon-icon { font-size: 28px; opacity: 0.4; }
 
+  /* ── SIGNUP ── */
+  .signup-section {
+    padding: 80px 56px;
+    background: #fafaf9;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .signup-inner {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .signup-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--indigo);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+  .signup-eyebrow::before {
+    content: '';
+    width: 16px; height: 1.5px;
+    background: var(--grad);
+    display: block;
+  }
+  .signup-eyebrow::after {
+    content: '';
+    width: 16px; height: 1.5px;
+    background: var(--grad);
+    display: block;
+  }
+  .signup-section h2 {
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .signup-section p {
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 32px;
+  }
+  .signup-form {
+    display: flex;
+    gap: 10px;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+  .signup-input {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    color: var(--text);
+    background: #fff;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .signup-input:focus { border-color: var(--indigo); }
+  .signup-input::placeholder { color: var(--light); }
+  .signup-btn {
+    background: var(--grad);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 12px 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+    font-family: inherit;
+  }
+  .signup-btn:hover { opacity: 0.88; }
+  .signup-success {
+    display: none;
+    color: #059669;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 16px;
+  }
+  @media (max-width: 700px) {
+    .signup-section { padding: 60px 24px; }
+    .signup-form { flex-direction: column; }
+  }
+
   /* ── FOOTER ── */
   footer {
     border-top: 1px solid var(--border);
@@ -442,7 +539,7 @@
   <a href="/" class="nav-logo">DLCG <span class="grad">Innovation Labs</span></a>
   <div class="nav-links">
     <a href="#products">Products</a>
-    <a href="#" class="nav-cta">Get Access</a>
+    <a href="#signup" class="nav-cta">Get Access</a>
   </div>
 </nav>
 
@@ -461,7 +558,7 @@
     </div>
     <div class="hero-actions">
       <a href="#products" class="btn-primary">Explore our products →</a>
-      <a href="#" class="btn-ghost">Get access</a>
+      <a href="#signup" class="btn-ghost">Get access</a>
     </div>
   </div>
 </div>
@@ -501,7 +598,7 @@
           </div>
           <div class="product-actions">
             <a href="https://easycalcs.vercel.app" target="_blank" rel="noopener" class="btn-try">Try it now →</a>
-            <button class="btn-feedback">💬 Feedback</button>
+            <a href="mailto:Mike.Pacione@dlc.ca?subject=EasyCalcs%20Feedback" class="btn-feedback">💬 Feedback</a>
           </div>
         </div>
       </div>
@@ -527,7 +624,7 @@
           </div>
           <div class="product-actions">
             <a href="https://callsmart-new.vercel.app/" target="_blank" rel="noopener" class="btn-try">Try it now →</a>
-            <button class="btn-feedback">💬 Feedback</button>
+            <a href="mailto:uche.emeni@newton.ca?subject=CallSmart%20Feedback" class="btn-feedback">💬 Feedback</a>
           </div>
         </div>
       </div>
@@ -544,11 +641,51 @@
   </div>
 </div>
 
+<!-- SIGNUP -->
+<div class="signup-section" id="signup">
+  <div class="signup-inner">
+    <div class="signup-eyebrow">Stay in the loop</div>
+    <h2>Be first to know what we ship next</h2>
+    <p>Sign up and we'll let you know when new products launch, existing ones get updated, and what the team is working on next.</p>
+    <form class="signup-form" onsubmit="handleSignup(event)">
+      <input class="signup-input" type="email" name="email" placeholder="your@email.com" required />
+      <button class="signup-btn" type="submit">Sign me up</button>
+    </form>
+    <div class="signup-success" id="signup-success">✓ You're in! We'll be in touch when something ships.</div>
+  </div>
+</div>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">DLCG <span class="grad">Innovation Labs</span></div>
   <div class="footer-copy">© 2026 DLCG · Innovation Labs</div>
 </footer>
+
+<script>
+// Email signup — submits to Formspree and collects in your inbox
+async function handleSignup(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn  = form.querySelector('.signup-btn');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+  try {
+    const res = await fetch('https://formspree.io/f/Mike.Pacione@dlc.ca', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: form.email.value })
+    });
+    if (res.ok) {
+      form.style.display = 'none';
+      document.getElementById('signup-success').style.display = 'block';
+    } else { throw new Error(); }
+  } catch {
+    btn.textContent = 'Sign me up';
+    btn.disabled = false;
+    alert('Something went wrong — please try emailing Mike.Pacione@dlc.ca directly.');
+  }
+}
+</script>
 
 <script>
 (function () {
