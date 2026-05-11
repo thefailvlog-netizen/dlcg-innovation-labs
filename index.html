@@ -662,7 +662,7 @@
 </footer>
 
 <script>
-// Email signup — submits to Formspree and collects in your inbox
+// Email signup — submits to Formsubmit.co, no account needed
 async function handleSignup(e) {
   e.preventDefault();
   const form = e.target;
@@ -670,19 +670,24 @@ async function handleSignup(e) {
   btn.textContent = 'Sending…';
   btn.disabled = true;
   try {
-    const res = await fetch('https://formspree.io/Mike.Pacione@dlc.ca', {
+    const data = new FormData();
+    data.append('email', form.email.value);
+    data.append('_subject', 'New Innovation Labs Signup');
+    data.append('_captcha', 'false');
+    const res = await fetch('https://formsubmit.co/ajax/Mike.Pacione@dlc.ca', {
       method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: form.email.value })
+      headers: { 'Accept': 'application/json' },
+      body: data
     });
-    if (res.ok) {
+    const json = await res.json();
+    if (json.success === 'true' || json.success === true) {
       form.style.display = 'none';
       document.getElementById('signup-success').style.display = 'block';
     } else { throw new Error(); }
   } catch {
     btn.textContent = 'Sign me up';
     btn.disabled = false;
-    alert('Something went wrong — please try emailing Mike.Pacione@dlc.ca directly.');
+    alert('Something went wrong — please try again or email Mike.Pacione@dlc.ca directly.');
   }
 }
 </script>
