@@ -670,7 +670,7 @@ async function handleSignup(e) {
   btn.textContent = 'Sending…';
   btn.disabled = true;
   try {
-    const res = await fetch('https://formspree.io/f/Mike.Pacione@dlc.ca', {
+    const res = await fetch('https://formspree.io/Mike.Pacione@dlc.ca', {
       method: 'POST',
       headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: form.email.value })
