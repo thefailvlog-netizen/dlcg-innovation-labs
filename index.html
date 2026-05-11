@@ -683,11 +683,16 @@ async function handleSignup(e) {
     if (json.success === 'true' || json.success === true) {
       form.style.display = 'none';
       document.getElementById('signup-success').style.display = 'block';
-    } else { throw new Error(); }
-  } catch {
+    } else if (json.message && json.message.toLowerCase().includes('activation')) {
+      form.style.display = 'none';
+      document.getElementById('signup-success').innerHTML = '⏳ Almost there! The team is activating the form — check back in a moment.';
+      document.getElementById('signup-success').style.display = 'block';
+    } else { throw new Error(json.message || 'Unknown error'); }
+  } catch(err) {
     btn.textContent = 'Sign me up';
     btn.disabled = false;
-    alert('Something went wrong — please try again or email Mike.Pacione@dlc.ca directly.');
+    alert('Something went wrong — please try again shortly.');
+    console.error('Signup error:', err);
   }
 }
 </script>
